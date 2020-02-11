@@ -114,6 +114,11 @@ dependencies {
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportConstraintLayout
 
+    // Architecture libraries
+    implementation dependenciesList.lifecycleExtensions
+    annotationProcessor dependenciesList.lifecycleCompiler
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+
     implementation dependenciesList.gmsLocation
 
     implementation dependenciesList.multidex
