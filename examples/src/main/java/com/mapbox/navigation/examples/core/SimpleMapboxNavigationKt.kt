@@ -88,7 +88,7 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
     private lateinit var mapboxNavigation: MapboxNavigation
     private lateinit var localLocationEngine: LocationEngine
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
-    private lateinit var navigationMapboxMap: NavigationMapboxMap
+    private var navigationMapboxMap: NavigationMapboxMap? = null
     private lateinit var speechPlayer: NavigationSpeechPlayer
     private val replayRouteLocationEngine = ReplayRouteLocationEngine()
 
@@ -130,6 +130,9 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
                 .build()
 
         mapboxNavigation = getMapboxNavigation(newOptions)
+        mapboxNavigation.toggleHistory(true)
+        mapboxNavigation.startTripSession()
+        Timber.i("history_debug startTripSession ${mapboxNavigation.retrieveHistory()}")
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -172,9 +175,9 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
             style.addImage("marker", IconFactory.getInstance(this).defaultMarker().bitmap)
 
             navigationMapboxMap = NavigationMapboxMap(mapView, mapboxMap)
-            navigationMapboxMap.setCamera(DynamicCamera(mapboxMap))
-            navigationMapboxMap.addProgressChangeListener(mapboxNavigation)
-            navigationMapboxMap.setOnRouteSelectionChangeListener { route ->
+            navigationMapboxMap?.setCamera(DynamicCamera(mapboxMap))
+            navigationMapboxMap?.addProgressChangeListener(mapboxNavigation)
+            navigationMapboxMap?.setOnRouteSelectionChangeListener { route ->
                 mapboxNavigation.setRoutes(mapboxNavigation.getRoutes().toMutableList().apply {
                     remove(route)
                     add(0, route)
@@ -270,7 +273,7 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
 
     private val routesObserver = object : RoutesObserver {
         override fun onRoutesChanged(routes: List<DirectionsRoute>) {
-            navigationMapboxMap.drawRoutes(routes)
+            navigationMapboxMap?.drawRoutes(routes)
             if (routes.isEmpty()) {
                 Toast.makeText(this@SimpleMapboxNavigationKt, "Empty routes", Toast.LENGTH_SHORT)
                     .show()
@@ -339,9 +342,9 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
     }
 
     private fun initDynamicCamera(route: DirectionsRoute) {
-        navigationMapboxMap.updateLocationLayerRenderMode(RenderMode.GPS)
-        navigationMapboxMap.updateCameraTrackingMode(NavigationCamera.NAVIGATION_TRACKING_MODE_GPS)
-        navigationMapboxMap.startCamera(route)
+        navigationMapboxMap?.updateLocationLayerRenderMode(RenderMode.GPS)
+        navigationMapboxMap?.updateCameraTrackingMode(NavigationCamera.NAVIGATION_TRACKING_MODE_GPS)
+        navigationMapboxMap?.startCamera(route)
     }
 
     public override fun onResume() {
@@ -403,6 +406,7 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
         mapboxNavigation.unregisterVoiceInstructionsObserver(this)
         mapboxNavigation.stopTripSession()
         mapboxNavigation.onDestroy()
+        Timber.i("history_debug endTripSession ${mapboxNavigation.retrieveHistory()}")
 
         restartSessionEventChannel.cancel()
 
@@ -466,6 +470,6 @@ class SimpleMapboxNavigationKt : AppCompatActivity(), OnMapReadyCallback,
             RouteProgressState.LOCATION_STALE -> R.drawable.logistics_user_puck_icon
             else -> R.drawable.logistics_user_puck_icon_uncertain_location
         }
-        navigationMapboxMap.updateCurrentLocationDrawable(drawableId)
+        navigationMapboxMap?.updateCurrentLocationDrawable(drawableId)
     }
 }
