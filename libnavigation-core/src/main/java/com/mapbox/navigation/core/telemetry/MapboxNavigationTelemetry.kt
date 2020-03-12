@@ -18,12 +18,16 @@ import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.accounts.MapboxNavigationAccounts
 import com.mapbox.navigation.core.fasterroute.FasterRouteObserver
 import com.mapbox.navigation.core.telemetry.events.MOCK_PROVIDER
-import com.mapbox.navigation.core.telemetry.events.TelemetryArrival
-import com.mapbox.navigation.core.telemetry.events.TelemetryCancel
-import com.mapbox.navigation.core.telemetry.events.TelemetryDepartureEvent
+import com.mapbox.navigation.core.telemetry.events.MetricsRouteProgress
+import com.mapbox.navigation.core.telemetry.events.NavigationArriveEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationCancelEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationDepartEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationRerouteEvent
+import com.mapbox.navigation.core.telemetry.events.PhoneState
+import com.mapbox.navigation.core.telemetry.events.RerouteEvent
+import com.mapbox.navigation.core.telemetry.events.SessionState
 import com.mapbox.navigation.core.telemetry.events.TelemetryFasterRoute
 import com.mapbox.navigation.core.telemetry.events.TelemetryMetadata
-import com.mapbox.navigation.core.telemetry.events.TelemetryReroute
 import com.mapbox.navigation.core.telemetry.events.TelemetryStep
 import com.mapbox.navigation.core.telemetry.events.TelemetryUserFeedback
 import com.mapbox.navigation.core.trip.session.OffRouteObserver
@@ -221,6 +225,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
             ) { preEventBuffer, postEventBuffer ->
                 telemetryThreadControl.scope.launch {
                     val result = telemetryEventGate(
+/*
                         TelemetryReroute(
                             newDistanceRemaining = newRoute.route.distance()?.toInt() ?: -1,
                             newDurationRemaining = newRoute.route.duration()?.toInt() ?: -1,
@@ -237,6 +242,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                             feedbackId = TelemetryUtils.obtainUniversalUniqueIdentifier(),
                             secondsSinceLastReroute = timeSinceLastEvent / ONE_SECOND
                         )
+ */
+                        NavigationRerouteEvent(PhoneState(context), RerouteEvent(SessionState()), MetricsRouteProgress(null))
                     )
                     Log.d(TAG, "REROUTE event sent $result")
                 }
@@ -413,6 +420,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         ) {
             when (dynamicValues.routeArrived.get()) {
                 true -> {
+                    /*
                     val cancelEvent = TelemetryCancel(
                         arrivalTimestamp = Date().toString(),
                         metadata = populateMetadataWithInitialValues(populateEventMetadataAndUpdateState(
@@ -420,6 +428,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                             locationEngineName = locationEngineName
                         ))
                     )
+                     */
+                    val cancelEvent = NavigationCancelEvent(PhoneState(context))
                     telemetryThreadControl.scope.launch {
                         val result = telemetryEventGate(cancelEvent)
                         Log.d(TAG, "ARRIVAL event sent $result")
@@ -428,12 +438,15 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                     }
                 }
                 false -> {
+                    /*
                     val cancelEvent = TelemetryCancel(
                         metadata = populateMetadataWithInitialValues(populateEventMetadataAndUpdateState(
                             Date(),
                             locationEngineName = locationEngineName
                         ))
                     )
+                     */
+                    val cancelEvent = NavigationCancelEvent(PhoneState(context))
                     val result = telemetryEventGate(cancelEvent)
                     Log.d(TAG, "CANCEL event sent $result")
                     callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
@@ -541,20 +554,25 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                 when (routeData.routeProgress.currentState()) {
                     RouteProgressState.ROUTE_ARRIVED -> {
                         val result = telemetryEventGate(
+                            /*
                             TelemetryArrival(
                                 arrivalTimestamp = Date().toString(),
                                 metadata = populateMetadataWithInitialValues(populateEventMetadataAndUpdateState(
                                     Date(),
                                     locationEngineName = locationEngineName
                                 )).apply {
-                                    lat = callbackDispatcher.getLastLocation()?.latitude?.toFloat() ?: currentLocation.get()?.latitude?.toFloat() ?: 0f
-                                    lng = callbackDispatcher.getLastLocation()?.longitude?.toFloat() ?: currentLocation.get()?.longitude?.toFloat() ?: 0f
+                                    lat = callbackDispatcher.getLastLocation()?.latitude?.toFloat()
+                                        ?: currentLocation.get()?.latitude?.toFloat() ?: 0f
+                                    lng = callbackDispatcher.getLastLocation()?.longitude?.toFloat()
+                                        ?: currentLocation.get()?.longitude?.toFloat() ?: 0f
                                     distanceCompleted =
                                         routeData.routeProgress.distanceTraveled().toInt() // TODO: Log this data to see what is returned from the SDK
                                     Log.i(TAG, "ROUTE_ARRIVED received")
                                     dynamicValues.routeArrived.set(true)
                                 }
                             )
+                             */
+                            NavigationArriveEvent(PhoneState(context))
                         )
                         Log.d(TAG, "ARRIVAL event sent $result")
                         callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
@@ -579,6 +597,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
     }
 
     private fun telemetryDeparture(directionsRoute: DirectionsRoute, startingLocation: Location): MetricEvent {
+        /*
         return TelemetryDepartureEvent(
             populateMetadataWithInitialValues(populateEventMetadataAndUpdateState(
                 Date(),
@@ -590,6 +609,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                 requestIdentifier = directionsRoute.routeOptions()?.requestUuid()
                 originalGeometry = directionsRoute.geometry()
             })
+         */
+        return NavigationDepartEvent(PhoneState(context))
     }
 
     private fun registerForNotification(mapboxNavigation: MapboxNavigation) {
