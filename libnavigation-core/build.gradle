@@ -43,6 +43,7 @@ dependencies {
     implementation project(':libnavigation-metrics')
     implementation dependenciesList.mapboxAndroidAccounts
     implementation dependenciesList.mapboxSdkTurf
+    implementation dependenciesList.mapboxSdkServices
 
     //ktlint
     ktlint dependenciesList.ktlint
