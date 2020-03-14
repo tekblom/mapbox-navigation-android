@@ -17,13 +17,21 @@ import com.mapbox.navigation.core.BuildConfig
 import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.accounts.MapboxNavigationAccounts
 import com.mapbox.navigation.core.fasterroute.FasterRouteObserver
-import com.mapbox.navigation.core.telemetry.events.*
+import com.mapbox.navigation.core.telemetry.events.MOCK_PROVIDER
+import com.mapbox.navigation.core.telemetry.events.MetricsRouteProgress
 import com.mapbox.navigation.core.telemetry.events.NavigationArriveEvent
 import com.mapbox.navigation.core.telemetry.events.NavigationCancelEvent
 import com.mapbox.navigation.core.telemetry.events.NavigationDepartEvent
 import com.mapbox.navigation.core.telemetry.events.NavigationEvent
 import com.mapbox.navigation.core.telemetry.events.NavigationFeedbackEvent
 import com.mapbox.navigation.core.telemetry.events.NavigationRerouteEvent
+import com.mapbox.navigation.core.telemetry.events.PhoneState
+import com.mapbox.navigation.core.telemetry.events.RerouteEvent
+import com.mapbox.navigation.core.telemetry.events.SessionState
+import com.mapbox.navigation.core.telemetry.events.TelemetryFasterRoute
+import com.mapbox.navigation.core.telemetry.events.TelemetryMetadata
+import com.mapbox.navigation.core.telemetry.events.TelemetryStep
+import com.mapbox.navigation.core.telemetry.events.TelemetryUserFeedback
 import com.mapbox.navigation.core.trip.session.OffRouteObserver
 import com.mapbox.navigation.core.trip.session.TripSessionState
 import com.mapbox.navigation.core.trip.session.TripSessionStateObserver
@@ -370,10 +378,10 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
      * Helper class that posts user feedback. The call is available only after initialization
      */
     private fun postUserFeedbackHelper(
-            @TelemetryUserFeedback.FeedbackType feedbackType: String,
-            description: String,
-            @TelemetryUserFeedback.FeedbackSource feedbackSource: String,
-            screenshot: String?
+        @TelemetryUserFeedback.FeedbackType feedbackType: String,
+        description: String,
+        @TelemetryUserFeedback.FeedbackSource feedbackSource: String,
+        screenshot: String?
     ) {
         Log.d(TAG, "trying to post a user feedback event")
         val lastProgress = callbackDispatcher.getRouteProgress()
@@ -549,7 +557,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                     RouteProgressState.LOCATION_TRACKING -> {
                         dynamicValues.timeRemaining.set(callbackDispatcher.getRouteProgress().routeProgress.durationRemaining().toInt())
                         dynamicValues.distanceRemaining.set(callbackDispatcher.getRouteProgress().routeProgress.distanceRemaining().toLong())
-                        when(trackingEvent > 20) {
+                        when (trackingEvent > 20) {
                             true -> {
                                 Log.i(TAG, "LOCATION_TRACKING received $trackingEvent")
                                 trackingEvent = 0
