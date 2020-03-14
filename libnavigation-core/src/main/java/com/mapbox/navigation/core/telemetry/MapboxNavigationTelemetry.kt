@@ -79,7 +79,7 @@ private data class DynamicallyUpdatedRouteValues(
         distanceCompleted.set(0f)
         durationRemaining.set(0)
         timeSinceLastReroute.set(0)
-        tripIdentifier.set(null)
+        tripIdentifier.set(TelemetryUtils.obtainUniversalUniqueIdentifier())
         sessionArrivalTime.set(null)
     }
 }
