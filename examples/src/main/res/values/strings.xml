@@ -44,6 +44,9 @@
     <string name="title_arrival_ui_building_extrusions_kotlin" translatable="false">Arrival UI Building Extrusions Kotlin</string>
     <string name="description_arrival_ui_building_extrusions_kotlin" translatable="false">Show building extrusions once the device is close enough to the final destination. Example\'s in Kotlin.</string>
 
+    <string name="title_instruction_view" translatable="false">Navigate with InstructionView</string>
+    <string name="description_instruction_view" translatable="false">Shows how to integrate InstructionView with core SDK.</string>
+
     <string name="title_component_navigation">MapboxNavigation with UI components</string>
     <string name="description_component_navigation">MapboxNavigation with UI components</string>
 
