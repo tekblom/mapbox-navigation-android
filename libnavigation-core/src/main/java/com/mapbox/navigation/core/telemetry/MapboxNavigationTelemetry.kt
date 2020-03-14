@@ -415,19 +415,10 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         ) {
             when (dynamicValues.routeArrived.get()) {
                 true -> {
-                    /*
-                    val cancelEvent = TelemetryCancel(
-                        arrivalTimestamp = Date().toString(),
-                        metadata = populateMetadataWithInitialValues(populateEventMetadataAndUpdateState(
-                            Date(),
-                            locationEngineName = locationEngineName
-                        ))
-                    )
-                     */
-                    val cancelEvent = NavigationCancelEvent(PhoneState(context))
-                    populateNavigationEvent(cancelEvent)
+                    val arrivalEvent = NavigationArriveEvent(PhoneState(context))
+                    populateNavigationEvent(arrivalEvent)
                     telemetryThreadControl.scope.launch {
-                        val result = telemetryEventGate(cancelEvent)
+                        val result = telemetryEventGate(arrivalEvent)
                         Log.d(TAG, "ARRIVAL event sent $result")
                         callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
                         retVal.complete(true)
@@ -548,6 +539,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                         dynamicValues.tripIdentifier.set(TelemetryUtils.obtainUniversalUniqueIdentifier())
                         dynamicValues.sessionArrivalTime.set(Date())
                         val arriveEvent = NavigationArriveEvent(PhoneState(context))
+                        dynamicValues.routeArrived.set(true)
                         populateNavigationEvent(arriveEvent)
                         val result = telemetryEventGate(arriveEvent)
                         Log.d(TAG, "ARRIVAL event sent $result")
