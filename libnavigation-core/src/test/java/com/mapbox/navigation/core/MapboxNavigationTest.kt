@@ -225,6 +225,17 @@ class MapboxNavigationTest {
         verify(exactly = 1) { directionsSession.requestRoutes(any(), any()) }
     }
 
+    @Test
+    fun enhanced_location_used_for_reroute() {
+        val offRouteObserverSlot = slot<OffRouteObserver>()
+        verify { tripSession.registerOffRouteObserver(capture(offRouteObserverSlot)) }
+
+        offRouteObserverSlot.captured.onOffRouteStateChanged(true)
+
+        verify(exactly = 1) { tripSession.getEnhancedLocation() }
+        verify(exactly = 0) { tripSession.getRawLocation() }
+    }
+
     // TODO Fix test not working because of MapboxNavigationTelemetry#unregisterListeners initializer = initializerDelegate
     @Ignore
     @Test
