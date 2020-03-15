@@ -1,6 +1,7 @@
 package com.mapbox.navigation.core.telemetry.events
 
 import android.content.Context
+import androidx.annotation.Keep
 import com.mapbox.android.telemetry.TelemetryUtils.isPluggedIn
 import com.mapbox.android.telemetry.TelemetryUtils.obtainApplicationState
 import com.mapbox.android.telemetry.TelemetryUtils.obtainBatteryLevel
@@ -15,6 +16,7 @@ import com.mapbox.navigation.core.telemetry.obtainVolumeLevel
 /**
  * Class that will hold the current states of the device phone.
  */
+@Keep
 data class PhoneState(val context: Context) {
     val volumeLevel: Int = obtainVolumeLevel(context)
     val batteryLevel: Int = obtainBatteryLevel(context)

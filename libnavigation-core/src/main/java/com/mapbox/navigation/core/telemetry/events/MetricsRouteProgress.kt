@@ -1,5 +1,6 @@
 package com.mapbox.navigation.core.telemetry.events
 
+import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.geojson.Point
@@ -7,6 +8,7 @@ import com.mapbox.navigation.base.trip.model.RouteLegProgress
 import com.mapbox.navigation.base.trip.model.RouteProgress
 import com.mapbox.navigation.utils.extensions.ifNonNull
 
+@Keep
 class MetricsRouteProgress(routeProgress: RouteProgress?) {
 
     companion object {
@@ -110,10 +112,8 @@ class MetricsRouteProgress(routeProgress: RouteProgress?) {
     private fun obtainLegData(legProgress: RouteLegProgress) {
         currentStepDistance = legProgress.currentStepProgress()?.step()?.distance()?.toInt() ?: 0
         currentStepDuration = legProgress.currentStepProgress()?.step()?.duration()?.toInt() ?: 0
-        currentStepDistanceRemaining = legProgress.currentStepProgress()?.distanceRemaining()?.toInt()
-            ?: 0
-        currentStepDurationRemaining = legProgress.currentStepProgress()?.durationRemaining()?.toInt()
-            ?: 0
+        currentStepDistanceRemaining = legProgress.currentStepProgress()?.distanceRemaining()?.toInt() ?: 0
+        currentStepDurationRemaining = legProgress.currentStepProgress()?.durationRemaining()?.toInt() ?: 0
         currentStepName = legProgress.currentStepProgress()?.step()?.name() ?: ""
     }
 
@@ -138,6 +138,7 @@ class MetricsRouteProgress(routeProgress: RouteProgress?) {
     private fun retrieveRouteDestination(route: DirectionsRoute): Point =
         route.legs()?.lastOrNull()?.steps()?.lastOrNull()?.maneuver()?.location()
             ?: DEFAULT_POINT
+
     fun dumpData(): String {
         val gson = Gson()
         return gson.toJson(this)

@@ -2,8 +2,10 @@ package com.mapbox.navigation.core.telemetry.events
 
 import android.annotation.SuppressLint
 import android.location.Location
+import androidx.annotation.Keep
 import com.google.gson.Gson
 
+@Keep
 @SuppressLint("ParcelCreator")
 internal class NavigationRerouteEvent(
     phoneState: PhoneState,
@@ -32,6 +34,7 @@ internal class NavigationRerouteEvent(
     override fun getEventName(): String = NAVIGATION_REROUTE
 
     override fun toJson(gson: Gson): String = gson.toJson(this)
+
     fun dumpData(): String {
         val gson = Gson()
         return gson.toJson(this)

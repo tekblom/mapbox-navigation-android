@@ -1,7 +1,9 @@
 package com.mapbox.navigation.core.telemetry.events
 
+import androidx.annotation.Keep
 import com.mapbox.android.telemetry.TelemetryUtils.obtainUniversalUniqueIdentifier
 
+@Keep
 class RerouteEvent(
     override var sessionState: SessionState
 ) : TelemetryEvent {
