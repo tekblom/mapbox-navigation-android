@@ -25,8 +25,8 @@ internal class NavigationRerouteEvent(
     val newGeometry: String = rerouteEvent.newRouteGeometry
     val step: NavigationStepData = NavigationStepData(metricsRouteProgress)
     var secondsSinceLastReroute: Int = 0
-    var locationsBefore: Array<Location>? = null
-    var locationsAfter: Array<Location>? = null
+    var locationsBefore: Array<Location>? = emptyArray()
+    var locationsAfter: Array<Location>? = emptyArray()
     var screenshot: String? = null
 
     override fun getEventName(): String = NAVIGATION_REROUTE

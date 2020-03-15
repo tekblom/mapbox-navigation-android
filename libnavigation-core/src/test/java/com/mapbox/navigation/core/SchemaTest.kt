@@ -1,21 +1,29 @@
 package com.mapbox.navigation.core
 
 import com.google.common.io.ByteStreams
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.SerializedName
-import com.mapbox.navigation.core.telemetry.events.*
-import org.junit.Assert
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import com.mapbox.navigation.core.telemetry.events.NavigationArriveEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationCancelEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationDepartEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationFeedbackEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationRerouteEvent
+import com.mapbox.navigation.core.telemetry.events.NavigationStepData
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.util.*
 import java.util.zip.GZIPInputStream
+import org.junit.Assert
+import org.junit.Before
+import org.junit.BeforeClass
+import org.junit.Test
 
 class SchemaTest {
     @Before
@@ -143,8 +151,8 @@ class SchemaTest {
 
     private fun typesMatch(schema: JsonObject, t: String) {
         var type = t
-        if (type.equals("int", ignoreCase = true) || type.equals("integer", ignoreCase = true)
-                || type.equals("double", ignoreCase = true) || type.equals("float", ignoreCase = true)) {
+        if (type.equals("int", ignoreCase = true) || type.equals("integer", ignoreCase = true) ||
+                type.equals("double", ignoreCase = true) || type.equals("float", ignoreCase = true)) {
             type = "number"
         }
         if (type.contains("[]")) {
@@ -183,7 +191,7 @@ class SchemaTest {
                 schema.remove("owner")
                 schema.remove("locationAuthorization")
                 schema.remove("locationEnabled")
-                //temporary need to work out a solution to include this data
+                // temporary need to work out a solution to include this data
                 schema.remove("platform")
                 return schema
             }

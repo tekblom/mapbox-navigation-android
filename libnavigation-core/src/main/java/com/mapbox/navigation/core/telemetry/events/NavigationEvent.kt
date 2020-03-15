@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Parcel
 import com.google.gson.Gson
 import com.mapbox.android.telemetry.Event
+import com.mapbox.android.telemetry.TelemetryUtils
 import com.mapbox.navigation.base.metrics.MetricEvent
 import com.mapbox.navigation.core.BuildConfig
 
@@ -21,7 +22,7 @@ internal abstract class NavigationEvent(
     val operatingSystem: String = OPERATING_SYSTEM
     val device: String? = Build.MODEL
     val sdkVersion: String = BuildConfig.MAPBOX_NAVIGATION_VERSION_NAME
-    val created: String = phoneState.created
+    val created: String = TelemetryUtils.obtainCurrentDate()
     val volumeLevel: Int = phoneState.volumeLevel
     val batteryLevel: Int = phoneState.batteryLevel
     val screenBrightness: Int = phoneState.screenBrightness
