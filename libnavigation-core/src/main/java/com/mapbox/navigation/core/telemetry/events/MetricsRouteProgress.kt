@@ -1,5 +1,6 @@
 package com.mapbox.navigation.core.telemetry.events
 
+import com.google.gson.Gson
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.geojson.Point
 import com.mapbox.navigation.base.trip.model.RouteLegProgress
@@ -137,4 +138,8 @@ class MetricsRouteProgress(routeProgress: RouteProgress?) {
     private fun retrieveRouteDestination(route: DirectionsRoute): Point =
         route.legs()?.lastOrNull()?.steps()?.lastOrNull()?.maneuver()?.location()
             ?: DEFAULT_POINT
+    fun dumpData(): String {
+        val gson = Gson()
+        return gson.toJson(this)
+    }
 }

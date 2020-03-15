@@ -32,4 +32,8 @@ internal class NavigationRerouteEvent(
     override fun getEventName(): String = NAVIGATION_REROUTE
 
     override fun toJson(gson: Gson): String = gson.toJson(this)
+    fun dumpData(): String {
+        val gson = Gson()
+        return gson.toJson(this)
+    }
 }
