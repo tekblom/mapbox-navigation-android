@@ -35,6 +35,7 @@ import com.mapbox.navigation.core.telemetry.events.TelemetryUserFeedback
 import com.mapbox.navigation.core.trip.session.OffRouteObserver
 import com.mapbox.navigation.core.trip.session.TripSessionState
 import com.mapbox.navigation.core.trip.session.TripSessionStateObserver
+import com.mapbox.navigation.metrics.MapboxMetricsReporter
 import com.mapbox.navigation.metrics.internal.NavigationAppUserTurnstileEvent
 import com.mapbox.navigation.utils.exceptions.NavigationException
 import com.mapbox.navigation.utils.thread.JobControl
@@ -110,6 +111,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
     private lateinit var telemetryThreadControl: JobControl
     private lateinit var metricsReporter: MetricsReporter
     private lateinit var navigationOptions: NavigationOptions
+    private lateinit var localUserAgent: String
+    private val remoteTelemetryToggle = AtomicBoolean(true)
 
     /**
      * This class holds all mutable state of the Telemetry object
@@ -307,30 +310,31 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
     /**
      * One-time initializer. Called in response to initialize() and then replaced with a no-op lambda to prevent multiple initialize() calls
      */
-    private val preInitializePredicate: (Context, String, MapboxNavigation, MetricsReporter, String, JobControl, NavigationOptions) -> Boolean =
-        { context, token, mapboxNavigation, metricsReporter, name, jobControl, options ->
-            this.context = context
-            locationEngineNameExternal = name
-            navigationOptions = options
-            telemetryThreadControl = jobControl
-            mapboxToken = token
-            validateAccessToken(mapboxToken)
-            this.metricsReporter = metricsReporter
-            initializer =
-                postInitializePredicate // prevent primaryInitializer() from being called more than once.
-            registerForNotification(mapboxNavigation)
-            postTurnstileEvent()
-            monitorJobCancelation()
-            Log.i(TAG, "Valid initialization")
-            true
-        }
+    private val preInitializePredicate: (Context, String, MapboxNavigation, MetricsReporter, String, JobControl, NavigationOptions, String) -> Boolean =
+            { context, token, mapboxNavigation, metricsReporter, name, jobControl, options, userAgent ->
+                this.context = context
+                localUserAgent = userAgent
+                locationEngineNameExternal = name
+                navigationOptions = options
+                telemetryThreadControl = jobControl
+                mapboxToken = token
+                validateAccessToken(mapboxToken)
+                this.metricsReporter = metricsReporter
+                initializer =
+                        postInitializePredicate // prevent primaryInitializer() from being called more than once.
+                registerForNotification(mapboxNavigation)
+                postTurnstileEvent()
+                monitorJobCancelation()
+                Log.i(TAG, "Valid initialization")
+                true
+            }
 
     // Calling initialize multiple times does no harm. This call is a no-op.
-    private var postInitializePredicate: (Context, String, MapboxNavigation, MetricsReporter, String, JobControl, NavigationOptions) -> Boolean =
-        { _, _, _, _, _, _, _ ->
-            Log.i(TAG, "Already initialized")
-            false
-        }
+    private var postInitializePredicate: (Context, String, MapboxNavigation, MetricsReporter, String, JobControl, NavigationOptions, String) -> Boolean =
+            { _, _, _, _, _, _, _, _ ->
+                Log.i(TAG, "Allready initialized")
+                false
+            }
 
     private var initializer =
         preInitializePredicate // The initialize dispatcher that points to either pre or post initialization lambda
@@ -345,7 +349,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         metricsReporter: MetricsReporter,
         locationEngineName: String,
         jobControl: JobControl,
-        options: NavigationOptions
+        options: NavigationOptions,
+        userAgent: String
     ) = initializer(
         context,
         mapboxToken,
@@ -353,7 +358,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         metricsReporter,
         locationEngineName,
         jobControl,
-        options
+        options,
+        userAgent
     )
 
     private fun monitorJobCancelation() {
@@ -411,6 +417,18 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         })
     }
 
+    private suspend fun cancelCollectionAndDisable(): Job {
+        val job = callbackDispatcher.cancelCollectionAndPostFinalEvents()
+        when (remoteTelemetryToggle.compareAndSet(true, false)) {
+            true -> {
+                MapboxMetricsReporter.disable()
+            }
+            false -> {
+                Log.d(TAG, "Telemetry already disabled")
+            }
+        }
+        return job
+    }
     /**
      * This method posts a cancel event in response to onSessionEnd
      */
@@ -428,7 +446,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                     telemetryThreadControl.scope.launch {
                         val result = telemetryEventGate(arrivalEvent)
                         Log.d(TAG, "ARRIVAL event sent $result")
-                        callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
+                        cancelCollectionAndDisable().join()
                         retVal.complete(true)
                     }
                 }
@@ -437,7 +455,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                     populateNavigationEvent(cancelEvent)
                     val result = telemetryEventGate(cancelEvent)
                     Log.d(TAG, "CANCEL event sent $result")
-                    callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
+                    cancelCollectionAndDisable().join()
                     retVal.complete(false)
                 }
             }
@@ -452,13 +470,23 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         dynamicValues.reset()
         callbackDispatcher.clearOriginalRoute()
     }
-
+    private fun enableRemoteTelemetry() {
+        when (remoteTelemetryToggle.compareAndSet(false, true)) {
+            true -> {
+                MapboxMetricsReporter.init(context, mapboxToken, localUserAgent)
+            }
+            false -> {
+                Log.d(TAG, "Telemetry already enabled")
+            }
+        }
+    }
     /**
      * This method starts a session. If a session is active it will terminate it, causing an stop/cancel event to be sent to the servers.
      * Every session start is guaranteed to have a session end.
      */
     private fun handleSessionStart(startingLocation: Location) {
         telemetryThreadControl.scope.launch {
+            enableRemoteTelemetry()
             Log.d(TAG, "Wating in handdleSessionStart")
             val directionsRoute = callbackDispatcher.getOriginalRouteAsync().await()
             Log.d(TAG, "The wait is over")
@@ -552,7 +580,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                         populateNavigationEvent(arriveEvent)
                         val result = telemetryEventGate(arriveEvent)
                         Log.d(TAG, "ARRIVAL event sent $result")
-                        callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
+                        cancelCollectionAndDisable().join()
                         continueRunning = false
                     } // END
                     RouteProgressState.LOCATION_TRACKING -> {
@@ -632,7 +660,8 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         return SessionState().apply {
             secondsSinceLastReroute = timeSinceReroute
 //             eventRouteProgress: MetricsRouteProgress = MetricsRouteProgress(null)
-            eventLocation = newLocation ?: callbackDispatcher.getLastLocation() ?: Location("unknown")
+            eventLocation = newLocation ?: callbackDispatcher.getLastLocation()
+                    ?: Location("unknown")
 
             eventDate = Date()
             eventRouteDistanceCompleted = callbackDispatcher.getRouteProgress().routeProgress.distanceTraveled().toDouble()

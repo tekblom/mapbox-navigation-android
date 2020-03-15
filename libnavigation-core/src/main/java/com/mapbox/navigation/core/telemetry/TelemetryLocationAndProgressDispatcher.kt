@@ -172,10 +172,13 @@ internal class TelemetryLocationAndProgressDispatcher(scope: CoroutineScope) :
      * This method cancels all jobs that accumulate telemetry data. The side effect of this call is to call Telemetry.addEvent(), which may cause events to be sent
      * to the back-end server
      */
-    fun cancelCollectionAndPostFinalEvents() =
-        ThreadController.getIOScopeAndRootJob().scope.launch {
+    fun cancelCollectionAndPostFinalEvents(): Job {
+        val job = ThreadController.getIOScopeAndRootJob().scope.launch {
             flushBuffers()
         }
+        locationEventBuffer.clear()
+        return job
+    }
 
     /**
      * This channel becomes signaled if a navigation route is selected
