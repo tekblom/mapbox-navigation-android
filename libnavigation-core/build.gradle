@@ -52,7 +52,9 @@ dependencies {
 
     testImplementation project(':libtesting-utils')
     apply from: "${rootDir}/gradle/unit-testing-dependencies.gradle"
+    testImplementation dependenciesList.commonsIO
 }
 
 apply from: "${rootDir}/gradle/jacoco.gradle"
 apply from: "${rootDir}/gradle/bintray-publish.gradle"
+apply from: "${rootDir}/gradle/download-schema.gradle"
