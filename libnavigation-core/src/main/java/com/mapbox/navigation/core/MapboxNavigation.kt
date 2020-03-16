@@ -191,8 +191,7 @@ constructor(
                 accessToken ?: throw RuntimeException(MAPBOX_NAVIGATION_TOKEN_EXCEPTION),
                 userAgent
             )
-            // TODO Add isDebugLoggingEnabled to NavigationOptions and uncomment below line
-            //  MapboxMetricsReporter.toggleLogging(navigationOptions.isDebugLoggingEnabled);
+            MapboxMetricsReporter.toggleLogging(navigationOptions.isDebugLoggingEnabled)
             MapboxNavigationTelemetry.initialize(
                 context.applicationContext,
                 token,

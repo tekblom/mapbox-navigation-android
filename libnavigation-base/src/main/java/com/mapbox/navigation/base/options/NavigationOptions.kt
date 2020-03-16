@@ -16,7 +16,8 @@ data class NavigationOptions constructor(
     val fasterRouteDetectorInterval: Long,
     val distanceFormatter: DistanceFormatter?,
     val onboardRouterConfig: MapboxOnboardRouterConfig?,
-    val isFromNavigationUi: Boolean = false
+    val isFromNavigationUi: Boolean = false,
+    val isDebugLoggingEnabled: Boolean = false
 ) {
 
     /**
@@ -28,7 +29,8 @@ data class NavigationOptions constructor(
         navigatorPollingDelay,
         fasterRouteDetectorInterval,
         distanceFormatter,
-        onboardRouterConfig
+        onboardRouterConfig,
+        isDebugLoggingEnabled
     )
 
     data class Builder(
@@ -38,7 +40,8 @@ data class NavigationOptions constructor(
         private var fasterRouteDetectorInterval: Long = DEFAULT_FASTER_ROUTE_DETECTOR_INTERVAL,
         private var distanceFormatter: DistanceFormatter? = null,
         private var onboardRouterConfig: MapboxOnboardRouterConfig? = null,
-        private var isFromNavigationUi: Boolean = false
+        private var isFromNavigationUi: Boolean = false,
+        private var isDebugLoggingEnabled: Boolean = false
     ) {
 
         fun roundingIncrement(roundingIncrement: Int) =
@@ -62,6 +65,9 @@ data class NavigationOptions constructor(
         fun isFromNavigationUi(flag: Boolean) =
             apply { this.isFromNavigationUi = flag }
 
+        fun isDebugLoggingEnabled(flag: Boolean) =
+            apply { this.isDebugLoggingEnabled = flag }
+
         fun build(): NavigationOptions {
             return NavigationOptions(
                 roundingIncrement,
@@ -70,7 +76,8 @@ data class NavigationOptions constructor(
                 fasterRouteDetectorInterval,
                 distanceFormatter,
                 onboardRouterConfig,
-                isFromNavigationUi
+                isFromNavigationUi,
+                isDebugLoggingEnabled
             )
         }
     }

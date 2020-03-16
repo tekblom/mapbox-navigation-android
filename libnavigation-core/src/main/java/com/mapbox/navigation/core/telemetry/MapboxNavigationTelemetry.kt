@@ -691,7 +691,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
     private fun populateNavigationEvent(navigationEvent: NavigationEvent, route: DirectionsRoute? = null, newLocation: Location? = null) {
         val directionsRoute = route ?: callbackDispatcher.getRouteProgress().routeProgress.route()
         val location = newLocation ?: callbackDispatcher.getLastLocation()
-        navigationEvent.startTimestamp = TelemetryUtils.obtainCurrentDate() // TODO This should be the timestamp when user started navigation
+        navigationEvent.startTimestamp = dynamicValues.sessionStartTime.toString()
         navigationEvent.sdkIdentifier = generateSdkIdentifier()
         navigationEvent.sessionIdentifier = dynamicValues.sessionId
         navigationEvent.geometry = callbackDispatcher.getRouteProgress().routeProgress.route()?.geometry()
@@ -755,7 +755,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         val metadata =
             TelemetryMetadata(
                 created = creationDate,
-                startTimestamp = TelemetryUtils.obtainCurrentDate(), // TODO This should be the timestamp when user started navigation
+                startTimestamp = dynamicValues.sessionStartTime.toString(),
                 device = Build.DEVICE,
                 sdkIdentifier = sdkType,
                 sdkVersion = BuildConfig.MAPBOX_NAVIGATION_VERSION_NAME,
