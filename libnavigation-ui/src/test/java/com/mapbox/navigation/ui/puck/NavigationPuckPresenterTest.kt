@@ -30,13 +30,11 @@ class NavigationPuckPresenterTest {
         val builder = mockk<LocationComponentOptions.Builder>()
         val drawableSlot = slot<Int>()
         every { mapboxMap.locationComponent } returns locationComponent
-        every { mapboxMap.padding } returns intArrayOf()
         every { locationComponent.locationComponentOptions } returns locationComponentOptions
         every { routeProgress.currentState() } returns RouteProgressState.LOCATION_TRACKING
         every { locationComponentOptions.gpsDrawable() } returns 0
         every { locationComponentOptions.toBuilder() } returns builder
         every { builder.gpsDrawable(capture(drawableSlot)) } returns builder
-        every { builder.padding(any()) } returns builder
         every { builder.build() } returns locationComponentOptions
         presenter.addProgressChangeListener(mapboxNavigation)
         verify { mapboxNavigation.registerRouteProgressObserver(capture(routeProgressObserverSlot)) }
