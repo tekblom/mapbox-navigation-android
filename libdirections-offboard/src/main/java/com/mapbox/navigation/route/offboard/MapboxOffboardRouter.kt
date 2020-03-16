@@ -39,6 +39,7 @@ class MapboxOffboardRouter(
     ) {
         mapboxDirections = RouteBuilderProvider.getBuilder(accessToken, context, skuTokenProvider)
             .routeOptions(routeOptions)
+            .enableRefresh(routeOptions.isRefreshEnabled())
             .build()
         mapboxDirections?.enqueueCall(object : Callback<DirectionsResponse> {
 
@@ -68,4 +69,8 @@ class MapboxOffboardRouter(
         mapboxDirections?.cancelCall()
         mapboxDirections = null
     }
+}
+
+private fun RouteOptions.isRefreshEnabled(): Boolean {
+    return profile().contains(other = "traffic", ignoreCase = true)
 }

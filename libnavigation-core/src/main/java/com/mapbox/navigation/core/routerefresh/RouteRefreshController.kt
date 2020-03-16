@@ -32,11 +32,13 @@ internal class RouteRefreshController(
     fun start(): Job {
         stop()
         return routerRefreshTimer.startTimer {
-            routeRefreshApi.refreshRoute(
-                accessToken,
-                tripSession.route,
-                tripSession.getRouteProgress(),
-                routeRefreshCallback)
+            if (routeRefreshApi.supportsRefresh(tripSession.route)) {
+                routeRefreshApi.refreshRoute(
+                    accessToken,
+                    tripSession.route,
+                    tripSession.getRouteProgress(),
+                    routeRefreshCallback)
+            }
         }
     }
 

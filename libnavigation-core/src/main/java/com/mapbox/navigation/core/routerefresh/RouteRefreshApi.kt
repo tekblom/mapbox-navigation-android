@@ -7,6 +7,12 @@ import com.mapbox.navigation.base.trip.model.RouteProgress
 internal class RouteRefreshApi(
     private val routeRefreshRetrofit: RouteRefreshRetrofit
 ) {
+    fun supportsRefresh(route: DirectionsRoute?): Boolean {
+        val isTrafficProfile = route?.routeOptions()
+            ?.profile()?.contains(other = "traffic", ignoreCase = true)
+        return isTrafficProfile == true
+    }
+
     fun refreshRoute(
         accessToken: String,
         route: DirectionsRoute?,
@@ -17,10 +23,17 @@ internal class RouteRefreshApi(
         if (accessToken.isNotEmpty()) {
             refreshBuilder.accessToken(accessToken)
         }
+
         val originalRoute: DirectionsRoute = route ?: run {
             callback.onError(RouteRefreshError("No DirectionsRoute to refresh"))
             return
         }
+
+        if (!supportsRefresh(originalRoute)) {
+            callback.onError(RouteRefreshError("Unsupported profile ${originalRoute.routeOptions()?.profile()}"))
+            return
+        }
+
         originalRoute.routeOptions()?.requestUuid()?.let {
             refreshBuilder.requestId(it)
         }

@@ -196,7 +196,6 @@ constructor(
 
         adjustedRouteOptionsProvider = AdjustedRouteOptionsProvider(directionsSession, tripSession)
         fasterRouteController = FasterRouteController(adjustedRouteOptionsProvider, directionsSession, tripSession)
-
         routeRefreshController = RouteRefreshController(accessToken ?: "", tripSession)
         routeRefreshController.start()
     }
