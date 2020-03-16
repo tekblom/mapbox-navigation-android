@@ -175,8 +175,8 @@ internal class TelemetryLocationAndProgressDispatcher(scope: CoroutineScope) :
     fun cancelCollectionAndPostFinalEvents(): Job {
         val job = ThreadController.getIOScopeAndRootJob().scope.launch {
             flushBuffers()
+            locationEventBuffer.clear()
         }
-        locationEventBuffer.clear()
         return job
     }
 

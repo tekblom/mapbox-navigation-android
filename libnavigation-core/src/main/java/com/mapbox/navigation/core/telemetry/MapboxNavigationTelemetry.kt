@@ -631,7 +631,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
 
     override fun unregisterListeners(mapboxNavigation: MapboxNavigation) =
         telemetryThreadControl.scope.launch {
-            callbackDispatcher.cancelCollectionAndPostFinalEvents().join()
+            cancelCollectionAndDisable().join()
             mapboxNavigation.unregisterOffRouteObserver(rerouteObserver)
             mapboxNavigation.unregisterRouteProgressObserver(callbackDispatcher)
             mapboxNavigation.unregisterTripSessionStateObserver(sessionStateObserver)
