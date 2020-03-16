@@ -111,7 +111,9 @@ class MapFpsDelegate implements OnTrackingModeChangedListener, OnTrackingModeTra
   }
 
   private boolean validLowFpsManeuver(RouteLegProgress routeLegProgress) {
-    if (routeLegProgress.currentStepProgress() != null && routeLegProgress.currentStepProgress().step() != null && routeLegProgress.currentStepProgress().step().maneuver() != null) {
+    if (routeLegProgress.currentStepProgress() != null
+        && routeLegProgress.currentStepProgress().step() != null
+        && routeLegProgress.currentStepProgress().step().maneuver() != null) {
       final String maneuverModifier = routeLegProgress.currentStepProgress().step().maneuver().modifier();
       return maneuverModifier != null
           && (maneuverModifier.equals(NavigationConstants.STEP_MANEUVER_MODIFIER_STRAIGHT)

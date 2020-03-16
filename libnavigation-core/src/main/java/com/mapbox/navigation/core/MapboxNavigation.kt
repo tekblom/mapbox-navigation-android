@@ -201,7 +201,7 @@ constructor(
                 locationEngine.javaClass.name,
                 ThreadController.getMainScopeAndRootJob(),
                 navigationOptions,
-                    userAgent
+                userAgent
             )
         }
     }
