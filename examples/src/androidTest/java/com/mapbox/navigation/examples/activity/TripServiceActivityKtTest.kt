@@ -84,7 +84,8 @@ class TripServiceActivityKtTest :
         }
     }
 
-    private inline fun awaitForView(resName: String, timeout: Long = 1000) {
+    // Increased timeout to 10.000 ms to check if it's enough for low power devices
+    private inline fun awaitForView(resName: String, timeout: Long = 10_000) {
         uiDevice.wait(Until.hasObject(By.res(TARGET_PACKAGE, resName)), timeout)
     }
 }
