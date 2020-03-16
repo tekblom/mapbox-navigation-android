@@ -7,18 +7,14 @@ import androidx.annotation.Keep
  */
 @Keep
 internal class NavigationStepData(metricsRouteProgress: MetricsRouteProgress) {
-    // TODO Fix hardcoded
-    val upcomingInstruction: String? = "Turn right onto Ridgemont Avenue" // Schema minLength 1
+    val upcomingInstruction: String? = metricsRouteProgress.upcomingStepInstruction // Schema minLength 1
     val upcomingModifier: String? = metricsRouteProgress.upcomingStepModifier
     val upcomingName: String? = metricsRouteProgress.upcomingStepName
-    // TODO Fix hardcoded
-    val upcomingType: String? = "turn" // Schema minLength 1
-    // TODO Fix hardcoded
-    val previousInstruction: String? = "Turn right onto Gaither Road" // Schema minLength 1
+    val upcomingType: String? = metricsRouteProgress.upcomingStepType // Schema minLength 1
+    val previousInstruction: String? = metricsRouteProgress.previousStepInstruction // Schema minLength 1
     val previousModifier: String? = metricsRouteProgress.previousStepModifier
     val previousName: String? = metricsRouteProgress.previousStepName
-    // TODO Fix hardcoded
-    val previousType: String? = "turn" // Schema minLength 1
+    val previousType: String? = metricsRouteProgress.previousStepType // Schema minLength 1
     val distance: Int = metricsRouteProgress.currentStepDistance
     val duration: Int = metricsRouteProgress.currentStepDuration
     val distanceRemaining: Int = metricsRouteProgress.currentStepDistanceRemaining

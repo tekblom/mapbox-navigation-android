@@ -417,7 +417,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         })
     }
 
-    private suspend fun cancelCollectionAndDisable(): Job {
+    private fun cancelCollectionAndDisable(): Job {
         val job = callbackDispatcher.cancelCollectionAndPostFinalEvents()
         when (remoteTelemetryToggle.compareAndSet(true, false)) {
             true -> {
@@ -553,7 +553,6 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                 location
             )).apply {
                 sessionIdentifier = TelemetryUtils.obtainUniversalUniqueIdentifier()
-                startTimestamp = Date().toString()
             }
             val result = telemetryEventGate(telemetryDeparture(directionsRoute, callbackDispatcher.getFirstLocationAsync().await()))
             Log.d(TAG, "DEPARTURE event sent $result")
@@ -691,7 +690,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
     private fun populateNavigationEvent(navigationEvent: NavigationEvent, route: DirectionsRoute? = null, newLocation: Location? = null) {
         val directionsRoute = route ?: callbackDispatcher.getRouteProgress().routeProgress.route()
         val location = newLocation ?: callbackDispatcher.getLastLocation()
-        navigationEvent.startTimestamp = dynamicValues.sessionStartTime.toString()
+        navigationEvent.startTimestamp = TelemetryUtils.generateCreateDateFormatted(dynamicValues.sessionStartTime)
         navigationEvent.sdkIdentifier = generateSdkIdentifier()
         navigationEvent.sessionIdentifier = dynamicValues.sessionId
         navigationEvent.geometry = callbackDispatcher.getRouteProgress().routeProgress.route()?.geometry()
@@ -755,7 +754,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         val metadata =
             TelemetryMetadata(
                 created = creationDate,
-                startTimestamp = dynamicValues.sessionStartTime.toString(),
+                startTimestamp = TelemetryUtils.generateCreateDateFormatted(dynamicValues.sessionStartTime),
                 device = Build.DEVICE,
                 sdkIdentifier = sdkType,
                 sdkVersion = BuildConfig.MAPBOX_NAVIGATION_VERSION_NAME,
