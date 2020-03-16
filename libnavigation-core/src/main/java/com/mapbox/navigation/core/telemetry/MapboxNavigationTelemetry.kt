@@ -312,6 +312,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
      */
     private val preInitializePredicate: (Context, String, MapboxNavigation, MetricsReporter, String, JobControl, NavigationOptions, String) -> Boolean =
         { context, token, mapboxNavigation, metricsReporter, name, jobControl, options, userAgent ->
+            remoteTelemetryToggle.set(true)
             this.context = context
             localUserAgent = userAgent
             locationEngineNameExternal = name
@@ -417,17 +418,17 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         })
     }
 
-    private fun cancelCollectionAndDisable(): Job {
-        val job = callbackDispatcher.cancelCollectionAndPostFinalEvents()
+    private fun cancelCollectionAndDisable() = telemetryThreadControl.scope.launch {
+        callbackDispatcher.cancelCollectionAndPostFinalEvents().join() // Wait for this job to complete before disabling Telemetry
         when (remoteTelemetryToggle.compareAndSet(true, false)) {
             true -> {
+                Log.d(TAG, "Disabling telemetry")
                 MapboxMetricsReporter.disable()
             }
             false -> {
                 Log.d(TAG, "Telemetry already disabled")
             }
         }
-        return job
     }
 
     /**

@@ -288,7 +288,6 @@ constructor(
         mainJobController.scope.launch {
             Log.d(TAG, "onDestroy")
             MapboxNavigationTelemetry.unregisterListeners(this@MapboxNavigation).join()
-            MapboxMetricsReporter.disable()
             ThreadController.cancelAllNonUICoroutines()
             ThreadController.cancelAllUICoroutines()
             directionsSession.shutDownSession()
