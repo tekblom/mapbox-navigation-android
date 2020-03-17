@@ -36,6 +36,7 @@ ext {
       leakCanaryVersion         : '1.6.3',
       timber                    : '4.7.1',
       testRunnerVersion         : '1.1.0',
+      testOrchestrator          : '1.2.0',
       espressoVersion           : '3.1.0',
       spoonRunner               : '1.6.2',
       commonsIO                 : '2.6',
@@ -132,6 +133,7 @@ ext {
       androidxTestJunit         : "androidx.test.ext:junit:${version.androidxTestJunit}",
       barista                   : "com.schibsted.spain:barista:${version.barista}",
       workTesting               : "androidx.work:work-testing:${version.workTesting}",
+      testOrchestrator          : "androidx.test:orchestrator:${version.testOrchestrator}",
 
       // unit test
       junit                     : "junit:junit:${version.junit}",

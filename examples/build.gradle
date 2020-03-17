@@ -41,8 +41,13 @@ android {
         versionCode gitVersionCode
         versionName gitVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
         vectorDrawables.useSupportLibrary = true
         buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     signingConfigs {
@@ -93,6 +98,7 @@ dependencies {
     implementation project(':libnavigator')
 
     androidTestImplementation project(':libtesting-ui')
+    androidTestUtil dependenciesList.testOrchestrator
 
     //ktlint
     ktlint dependenciesList.ktlint
