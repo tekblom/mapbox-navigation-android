@@ -180,7 +180,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                             Log.d(TAG, "TripSessionState.STOPPED false")
                             telemetryThreadControl.scope.launch {
                                 Log.d(TAG, "Session was canceled")
-                                handleSessionCanceled()
+                                handleSessionCanceled().await()
                                 handleSessionStop()
                             }
                         }
@@ -443,14 +443,9 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
         ) {
             when (dynamicValues.routeArrived.get()) {
                 true -> {
-                    val arrivalEvent = NavigationArriveEvent(PhoneState(context))
-                    populateNavigationEvent(arrivalEvent)
-                    telemetryThreadControl.scope.launch {
-                        val result = telemetryEventGate(arrivalEvent)
-                        Log.d(TAG, "ARRIVAL event sent $result")
-                        cancelCollectionAndDisable().join()
-                        retVal.complete(true)
-                    }
+                    // Do nothing
+                    Log.d(TAG, "attempt to cancel after arrival")
+                    retVal.complete(true)
                 }
                 false -> {
                     val cancelEvent = NavigationCancelEvent(PhoneState(context))
@@ -584,6 +579,7 @@ internal object MapboxNavigationTelemetry : MapboxNavigationTelemetryInterface {
                         val result = telemetryEventGate(arriveEvent)
                         Log.d(TAG, "ARRIVAL event sent $result")
                         cancelCollectionAndDisable().join()
+                        handleSessionStop()
                         continueRunning = false
                     } // END
                     RouteProgressState.LOCATION_TRACKING -> {
