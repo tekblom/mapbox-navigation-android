@@ -35,7 +35,7 @@ ext {
       butterknife               : '10.1.0',
       leakCanaryVersion         : '1.6.3',
       timber                    : '4.7.1',
-      testRunnerVersion         : '1.1.0',
+      testRunnerVersion         : '1.2.0',
       testOrchestrator          : '1.2.0',
       espressoVersion           : '3.1.0',
       spoonRunner               : '1.6.2',
