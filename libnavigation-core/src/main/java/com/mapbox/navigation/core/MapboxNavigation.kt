@@ -186,6 +186,7 @@ constructor(
             }
         val userAgent = obtainUserAgent(navigationOptions.isFromNavigationUi)
         ifNonNull(accessToken) { token ->
+            Log.d("MAPBOX_TELEMETRY", "MapboxMetricsReporter.init from MapboxNavigation main")
             MapboxMetricsReporter.init(
                 context,
                 accessToken ?: throw RuntimeException(MAPBOX_NAVIGATION_TOKEN_EXCEPTION),
