@@ -147,6 +147,14 @@ object MapboxNativeNavigatorImpl : MapboxNativeNavigator {
         navigator.setConfig(config)
     }
 
+    override fun useExtendedKalmanFilter(useEKF: Boolean) {
+        val config = getConfig()
+        if (config.useEKF != useEKF) {
+            config.useEKF = useEKF
+            setConfig(config)
+        }
+    }
+
     // Other
 
     override fun getVoiceInstruction(index: Int): VoiceInstruction? =

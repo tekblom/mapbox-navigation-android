@@ -243,6 +243,13 @@ interface MapboxNativeNavigator {
      */
     fun setConfig(config: NavigatorConfig?)
 
+    /**
+     * Updates the configuration to enable or disable the extended kalman filter (EKF).
+     *
+     * @param useEKF the new value for EKF
+     */
+    fun useExtendedKalmanFilter(useEKF: Boolean)
+
     // Other
 
     /**

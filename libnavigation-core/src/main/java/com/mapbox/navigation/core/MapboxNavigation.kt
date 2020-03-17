@@ -529,6 +529,10 @@ constructor(
         tripSession.updateSensorEvent(sensorEvent)
     }
 
+    fun useExtendedKalmanFilter(useEKF: Boolean) {
+        tripSession.useExtendedKalmanFilter(useEKF)
+    }
+
     companion object {
 
         @JvmStatic
